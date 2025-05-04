@@ -1,9 +1,7 @@
 from fastapi import APIRouter
-from .api_v1 import login, signup,health
+from app.api.api_v1.users import router as users_router
+from app.api.api_v1.llm import router as llm_router
 
 api_router = APIRouter()
-
-
-# router.include_router(health.router, prefix="/health", tags=["Health"])
-api_router.include_router(login.router, prefix="/users", tags=["Login"])
-api_router.include_router(signup.router, prefix="/users", tags=["Signup"])
+api_router.include_router(users_router, prefix="/users", tags=["Users"])
+# api_router.include_router(llm_router, prefix="/llm", tags=["LLM"])
