@@ -16,5 +16,6 @@ class UserUpdate(BaseModel):
 class UserOut(UserBase):
     uuid: UUID
 
-    class Config:
-     orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }

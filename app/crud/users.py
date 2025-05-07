@@ -48,7 +48,7 @@ def update_user(db: Session, user_uuid: UUID, user_update: UserUpdate):
 
 def user_delete(db: Session, user_uuid: UUID):
     user = get_user(db, user_uuid)
-    user_name = user.name  # استخراج الاسم قبل الحذف
+    user_name = user.name
     db.delete(user)
     db.commit()
     return {"ok": True, "message": f"User '{user_name}' deleted"}

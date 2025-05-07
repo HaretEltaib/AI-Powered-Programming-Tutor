@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from uuid import UUID
 from fastapi.security import OAuth2PasswordRequestForm
-
 from app.schemas.users import UserCreate, UserUpdate, UserOut
 from app.schemas.token import Token
 from app.db.dep import get_db
@@ -18,16 +17,17 @@ def create(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password, by_name=True)  # استخدم name
+    # تم التعديل هنا لاستخدام البريد الإلكتروني بدلاً من الاسم
+    user = authenticate_user(db, username=form_data.username, password=form_data.password, by_name=False)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect name or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.name},  # استخدم الاسم داخل الـ Token
+        data={"sub": user.email},  # استخدم البريد الإلكتروني داخل الـ Token
         expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
@@ -47,4 +47,3 @@ def user_update(user_uuid: UUID, user_update: UserUpdate, db: Session = Depends(
 @router.delete("/delete/{user_uuid}")
 def delete_user(user_uuid: UUID, db: Session = Depends(get_db)):
     return user_delete(user_uuid=user_uuid, db=db)
-

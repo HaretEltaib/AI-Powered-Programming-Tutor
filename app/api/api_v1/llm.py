@@ -1,10 +1,13 @@
 from fastapi import APIRouter
-from app.schemas.llm import Question, Answer
+from pydantic import BaseModel
 from app.services.llm_services import chat
 
 router = APIRouter()
 
-@router.post("/chat", response_model=Answer)
-def ask_question(query: Question):
-    answer_text = chat(query=query.question)
-    return {"answer": answer_text}
+class LLMQuery(BaseModel):
+    question: str
+
+@router.post("/chat")
+def ask_llm(query: LLMQuery):
+    response = chat(query.question)
+    return {"response": response}

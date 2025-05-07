@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
 class Question(BaseModel):
-    prompt: str
+    question: str
 
 class Answer(BaseModel):
-    response: str
+    answer: str
 
 class StructuredResponse(BaseModel):
-    response: str
+    text: str

@@ -19,6 +19,7 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def authenticate_user(db: Session, username: str, password: str, by_name: bool = False):
+    # تم تعديل هذا الجزء ليعتمد على البريد الإلكتروني بشكل افتراضي
     if by_name:
         user = db.query(User).filter(User.name == username).first()
     else:
@@ -32,3 +33,13 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def decode_access_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=401, detail="Invalid token: no subject")
+        return TokenData(email=email)
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
